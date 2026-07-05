@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Groove Lab 爵士鼓課室 | Jazz Drum Studio</title>
+  <meta name="description" content="香港爵士鼓課室 — 由零基礎到爵士即興，一對一及小組課程，專業鼓房設備。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #0f0e0c;
+  --bg-card: #1a1814;
+  --bg-elevated: #242018;
+  --text: #f5f0e8;
+  --text-muted: #a89f8f;
+  --accent: #d4a054;
+  --accent-light: #e8c078;
+  --border: rgba(212, 160, 84, 0.2);
+  --radius: 12px;
+  --font-sans: "Noto Sans TC", system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.container {
+  width: min(1100px, 92%);
+  margin: 0 auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(15, 14, 12, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.logo span {
+  color: var(--accent);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  list-style: none;
+}
+
+.nav-links a:not(.btn) {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.nav-links a:not(.btn):hover {
+  color: var(--accent-light);
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text);
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.nav-toggle[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #b8862e);
+  color: #1a1208;
+  box-shadow: 0 4px 24px rgba(212, 160, 84, 0.35);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 32px rgba(212, 160, 84, 0.45);
+}
+
+.btn-ghost {
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  background: var(--accent);
+  color: #1a1208;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 0 4rem;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 20%, rgba(212, 160, 84, 0.12), transparent),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(180, 100, 40, 0.08), transparent),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 80px,
+      rgba(212, 160, 84, 0.03) 80px,
+      rgba(212, 160, 84, 0.03) 81px
+    );
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+}
+
+.hero-tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  line-height: 1.15;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent-light);
+}
+
+.hero-desc {
+  max-width: 520px;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.hero-stats strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--accent-light);
+}
+
+.hero-stats span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.section {
+  padding: 5rem 0;
+}
+
+.section-dark {
+  background: var(--bg-card);
+}
+
+.section-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  margin-bottom: 1.5rem;
+  line-height: 1.25;
+}
+
+.section-intro {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  max-width: 560px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.split p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.section-intro a,
+.location-list a {
+  color: var(--accent-light);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.section-intro a:hover,
+.location-list a:hover {
+  color: var(--accent);
+}
+
+.check-list {
+  list-style: none;
+  margin-top: 1.5rem;
+}
+
+.check-list li {
+  padding: 0.5rem 0 0.5rem 1.75rem;
+  position: relative;
+  color: var(--text-muted);
+}
+
+.check-list li::before {
+  content: "♪";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.location-block {
+  margin-bottom: 2rem;
+}
+
+.location-block h3 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.location-type {
+  color: var(--accent-light);
+}
+
+.location-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.location-tags span {
+  display: inline-block;
+  padding: 0.5rem 1.1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.location-tags span:hover {
+  border-color: var(--accent);
+  background: rgba(212, 160, 84, 0.08);
+}
+
+.location-highlight {
+  border-color: var(--accent) !important;
+  background: rgba(212, 160, 84, 0.12) !important;
+  color: var(--accent-light) !important;
+}
+
+.location-note {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.location-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.location-list li {
+  padding: 0.35rem 0 0.35rem 1.25rem;
+  position: relative;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.location-list li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.package-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  background: rgba(212, 160, 84, 0.1);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.package-banner strong {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--accent-light);
+}
+
+.package-banner span {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.pricing-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.pricing-tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.pricing-tab:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.pricing-tab.active {
+  background: rgba(212, 160, 84, 0.15);
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+.pricing-panel {
+  margin-bottom: 1rem;
+}
+
+.pricing-unit {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.pricing-group-notice {
+  background: rgba(212, 160, 84, 0.08);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.pricing-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.pricing-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 320px;
+}
+
+.pricing-table th,
+.pricing-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.pricing-table th {
+  background: var(--bg);
+  color: var(--accent);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pricing-table td {
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.pricing-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pricing-table tbody tr:hover td {
+  background: rgba(212, 160, 84, 0.06);
+}
+
+.pricing-highlight td {
+  background: rgba(212, 160, 84, 0.08) !important;
+}
+
+.pricing-highlight td:first-child {
+  color: var(--accent-light);
+  font-weight: 600;
+}
+
+.pricing-note {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.start-guide {
+  margin-bottom: 2.5rem;
+}
+
+.start-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.start-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.start-type {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent-light);
+  margin-bottom: 0.75rem;
+}
+
+.start-price {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.start-meta {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.start-group-note {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: rgba(212, 160, 84, 0.06);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+@media (max-width: 900px) {
+  .start-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact-info {
+  margin-top: 1.5rem;
+}
+
+.contact-info p {
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.contact-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.contact-form input:focus,
+.contact-form select:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-note {
+  text-align: center;
+  color: var(--accent-light);
+  font-size: 0.9rem;
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 0;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.footer a:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+    transform: translateY(-120%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+
+  .nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .hero-stats {
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+}
+  </style>
+</head>
+<body>
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="#top" class="logo">Groove<span>Lab</span></a>
+      <button class="nav-toggle" aria-label="開啟選單" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#about">關於</a></li>
+        <li><a href="#locations">上課地點</a></li>
+        <li><a href="#pricing">收費</a></li>
+        <li><a href="#contact" class="btn btn-small">預約課堂</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="container hero-content">
+        <p class="hero-tag">ROCK ·METAL · 即興</p>
+        <h1>喺節奏裡面<br><em>搵到你嘅 Groove</em></h1>
+        <p class="hero-desc">
+          專業爵士鼓課室，適合初學者同進修者。
+          由握棒、節拍器到即興，一步步幫你建立扎實基本功。
+        </p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-primary">預約課堂</a>
+          <a href="#pricing" class="btn btn-ghost">睇收費</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>9</strong><span>區選擇</span></div>
+          <div><strong>4堂</strong><span>6 星期期限</span></div>
+          <div><strong>$160</strong><span>起 / 小時</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="container">
+        <div>
+          <p class="section-label">About</p>
+          <h2>唔只係教打鼓，<br>係教你「聽」音樂</h2>
+          <p>
+            Groove Lab 爵士鼓課室專注鼓手全面發展：技術、時間感、樂理同合奏能力。
+            無論你想夾 Band，定係純粹享受爵士即興，我哋都有清晰學習路徑。
+          </p>
+          <ul class="check-list">
+            <li>系統化教學，每堂有明確目標</li>
+            <li>Student Jam，實戰合奏</li>
+            <li>彈性時段，適合上班族同學生</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="locations">
+      <div class="container">
+        <p class="section-label">Locations</p>
+        <h2>上課地區選擇</h2>
+        <p class="section-intro">多區設有專業鼓房，方便你揀就近地點上課。上門服務詳情見下方。</p>
+
+        <div class="location-block">
+          <h3><span class="location-type">🔺九龍區</span></h3>
+          <ul class="location-list">
+            <li>旺角</li>
+            <li>新蒲崗</li>
+            <li>觀塘</li>
+          </ul>
+        </div>
+
+        <div class="location-block">
+          <h3><span class="location-type">🔺新界區</span></h3>
+          <ul class="location-list">
+            <li>荃灣</li>
+            <li>葵興</li>
+            <li>火炭</li>
+            <li>屯門</li>
+            <li>元朗</li>
+          </ul>
+        </div>
+
+        <div class="location-block">
+          <h3><span class="location-type">🔺港島區</span></h3>
+          <ul class="location-list">
+            <li>西營盤</li>
+          </ul>
+        </div>
+
+        <div class="location-block">
+          <h3><span class="location-type">🔺上門服務</span></h3>
+          <ul class="location-list">
+            <li>在家練習更方便</li>
+            <li>價錢可參考現時價目表，最終價錢將視乎實際地址而定</li>
+            <li>預約時請填寫地址，或 <a href="https://wa.me/85264022209" target="_blank" rel="noopener">WhatsApp 查詢</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="pricing">
+      <div class="container">
+        <p class="section-label">Pricing</p>
+        <h2>課堂收費</h2>
+
+        <div class="start-guide" id="start">
+          <div class="start-cards">
+            <div class="start-card">
+              <p class="start-type">零基礎學生首次單次體驗價</p>
+              <p class="start-price">$250</p>
+              <p class="start-meta">60 分鐘（一人班）</p>
+            </div>
+            <div class="start-card">
+              <p class="start-type">有基礎學生</p>
+              <p class="start-price">$1,280</p>
+              <p class="start-meta">4 堂評估 Package（一人班）</p>
+            </div>
+          </div>
+          <p class="start-group-note">二至六人班暫不設試堂，請直接選擇班別及級別，報讀 4 堂 Package。有基礎學生完成 4 堂評估 Package（一人班）後，需按照以下正價報名。</p>
+        </div>
+
+        <div class="package-banner">
+          <strong>4 堂Package</strong>
+          <span>6 星期期限，由第一堂開始計</span>
+        </div>
+
+        <div class="pricing-tabs" role="tablist" aria-label="班別價目">
+          <button class="pricing-tab active" role="tab" aria-selected="true" data-tab="solo">一人班</button>
+          <button class="pricing-tab" role="tab" aria-selected="false" data-tab="duo">二人班</button>
+          <button class="pricing-tab" role="tab" aria-selected="false" data-tab="trio">三人班</button>
+          <button class="pricing-tab" role="tab" aria-selected="false" data-tab="quad">四人班</button>
+          <button class="pricing-tab" role="tab" aria-selected="false" data-tab="penta">五人班</button>
+          <button class="pricing-tab" role="tab" aria-selected="false" data-tab="hexa">六人班</button>
+        </div>
+
+        <p class="pricing-group-notice" id="pricing-group-notice" hidden>
+          二至六人班暫時只適用於 DEBUT 至 G3 級別；如學生升級至 G4 或以上級別，則需改為一人班。若有特別需要，可與導師商討。
+        </p>
+
+        <div class="pricing-panel active" id="tab-solo" role="tabpanel">
+          <p class="pricing-unit">4 堂 Package 總價（每堂 60 分鐘）</p>
+          <div class="pricing-table-wrap">
+            <table class="pricing-table">
+              <thead>
+                <tr>
+                  <th>級別</th>
+                  <th>4 堂總價</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>DEBUT</td><td>$640</td></tr>
+                <tr><td>Grade 1</td><td>$1,000</td></tr>
+                <tr><td>Grade 2</td><td>$1,320</td></tr>
+                <tr><td>Grade 3</td><td>$1,480</td></tr>
+                <tr><td>Grade 4</td><td>$1,760</td></tr>
+                <tr><td>Grade 5</td><td>$2,040</td></tr>
+                <tr class="pricing-highlight"><td>Grade 8</td><td>$2,560</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="pricing-panel" id="tab-duo" role="tabpanel" hidden>
+          <p class="pricing-unit">4 堂 Package 總價（每堂 60 分鐘）</p>
+          <div class="pricing-table-wrap">
+            <table class="pricing-table">
+              <thead>
+                <tr>
+                  <th>級別</th>
+                  <th>4 堂總價</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>DEBUT</td><td>$1,640</td></tr>
+                <tr><td>Grade 1</td><td>$2,200</td></tr>
+                <tr><td>Grade 2</td><td>$2,680</td></tr>
+                <tr><td>Grade 3</td><td>$2,920</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="pricing-panel" id="tab-trio" role="tabpanel" hidden>
+          <p class="pricing-unit">4 堂 Package 總價（每堂 60 分鐘）</p>
+          <div class="pricing-table-wrap">
+            <table class="pricing-table">
+              <thead>
+                <tr>
+                  <th>級別</th>
+                  <th>4 堂總價</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>DEBUT</td><td>$1,960</td></tr>
+                <tr><td>Grade 1</td><td>$2,680</td></tr>
+                <tr><td>Grade 2</td><td>$3,320</td></tr>
+                <tr><td>Grade 3</td><td>$3,640</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="pricing-panel" id="tab-quad" role="tabpanel" hidden>
+          <p class="pricing-unit">4 堂 Package 總價（每堂 90 分鐘）</p>
+          <div class="pricing-table-wrap">
+            <table class="pricing-table">
+              <thead>
+                <tr>
+                  <th>級別</th>
+                  <th>4 堂總價</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>DEBUT</td><td>$3,160</td></tr>
+                <tr><td>Grade 1</td><td>$4,520</td></tr>
+                <tr><td>Grade 2</td><td>$5,720</td></tr>
+                <tr><td>Grade 3</td><td>$6,320</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="pricing-panel" id="tab-penta" role="tabpanel" hidden>
+          <p class="pricing-unit">4 堂 Package 總價（每堂 90 分鐘）</p>
+          <div class="pricing-table-wrap">
+            <table class="pricing-table">
+              <thead>
+                <tr>
+                  <th>級別</th>
+                  <th>4 堂總價</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>DEBUT</td><td>$3,880</td></tr>
+                <tr><td>Grade 1</td><td>$5,520</td></tr>
+                <tr><td>Grade 2</td><td>$6,960</td></tr>
+                <tr><td>Grade 3</td><td>$7,680</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="pricing-panel" id="tab-hexa" role="tabpanel" hidden>
+          <p class="pricing-unit">4 堂 Package 總價（每堂 90 分鐘）</p>
+          <div class="pricing-table-wrap">
+            <table class="pricing-table">
+              <thead>
+                <tr>
+                  <th>級別</th>
+                  <th>4 堂總價</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>DEBUT</td><td>$4,360</td></tr>
+                <tr><td>Grade 1</td><td>$6,280</td></tr>
+                <tr><td>Grade 2</td><td>$7,960</td></tr>
+                <tr><td>Grade 3</td><td>$8,800</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p class="pricing-note">* 級別按導師評估或考級程度安排。零基礎學生可報一人班單次體驗 $250（60 分鐘）；有基礎學生可報 4 堂評估 Package $1,280（DEBUT 至 G3，第一堂評估配級）。所有 4 堂 Package 須於 6 星期內完成，由第一堂上課日開始計算。一人班至三人班每堂 60 分鐘；四人班至六人班每堂 90 分鐘。二至六人班暫不設試堂。上門服務價錢可參考現時價目表，最終價錢將視乎實際地址而定。</p>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="container split">
+        <div>
+          <p class="section-label">Contact</p>
+          <h2>預約課堂</h2>
+          <p>填寫表格，我哋會 24 小時內 WhatsApp 你確認時間。</p>
+          <div class="contact-info">
+            <p><strong>上課地點</strong> 九龍：旺角、新蒲崗、觀塘｜新界：荃灣、葵興、火炭、屯門、元朗｜港島：西營盤</p>
+            <p><strong>WhatsApp</strong> <a href="https://wa.me/85264022209" target="_blank" rel="noopener">+852 6402 2209</a></p>
+          </div>
+        </div>
+        <form class="contact-form" id="contact-form">
+          <label>
+            姓名
+            <input type="text" name="name" required placeholder="你嘅名字">
+          </label>
+          <label>
+            電話 / WhatsApp
+            <input type="tel" name="phone" required placeholder="9123 4567">
+          </label>
+          <label>
+            報名類型
+            <select name="booking-type" required>
+              <option value="">請選擇</option>
+              <option value="trial">單次體驗（零基礎 · 一人班 · $250）</option>
+              <option value="assessment">有基礎 4 堂評估 Package（一人班 · $1,280）</option>
+              <option value="package">4 堂 Package（已知級別 / 續課）</option>
+            </select>
+          </label>
+          <label>
+            上課地區
+            <select name="location" required>
+              <option value="">請選擇</option>
+              <optgroup label="九龍區">
+                <option value="mong-kok">旺角</option>
+                <option value="san-po-kong">新蒲崗</option>
+                <option value="kwun-tong">觀塘</option>
+              </optgroup>
+              <optgroup label="新界區">
+                <option value="tsuen-wan">荃灣</option>
+                <option value="kwai-hing">葵興</option>
+                <option value="fo-tan">火炭</option>
+                <option value="tuen-mun">屯門</option>
+                <option value="yuen-long">元朗</option>
+              </optgroup>
+              <optgroup label="港島區">
+                <option value="sai-ying-pun">西營盤</option>
+              </optgroup>
+              <optgroup label="上門服務">
+                <option value="home-visit">上門服務（請於留言填寫地址）</option>
+              </optgroup>
+            </select>
+          </label>
+          <label>
+            班別
+            <select name="class-size" required>
+              <option value="">請選擇</option>
+              <option value="solo">一人班</option>
+              <option value="duo">二人班</option>
+              <option value="trio">三人班</option>
+              <option value="quad">四人班</option>
+              <option value="penta">五人班</option>
+              <option value="hexa">六人班</option>
+            </select>
+          </label>
+          <label>
+            級別（如已知）
+            <select name="grade">
+              <option value="">待導師評估</option>
+              <option value="debut">DEBUT</option>
+              <option value="g1">Grade 1</option>
+              <option value="g2">Grade 2</option>
+              <option value="g3">Grade 3</option>
+              <option value="g4">Grade 4</option>
+              <option value="g5">Grade 5</option>
+              <option value="g8">Grade 8</option>
+            </select>
+          </label>
+          <label>
+            留言（可選）
+            <textarea name="message" rows="3" placeholder="想學打鼓，打鼓好正"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary btn-full">送出預約</button>
+          <p class="form-note" id="form-note" hidden>即將開啟 WhatsApp，請按「傳送」完成預約。</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© 2026 Groove Lab 爵士鼓課室</p>
+      <a href="#top">返回頂部</a>
+    </div>
+  </footer>
+
+  <script>
+const navToggle = document.querySelector(".nav-toggle");
+const navLinks = document.querySelector(".nav-links");
+const form = document.getElementById("contact-form");
+const formNote = document.getElementById("form-note");
+
+navToggle.addEventListener("click", () => {
+  const open = navToggle.getAttribute("aria-expanded") === "true";
+  navToggle.setAttribute("aria-expanded", String(!open));
+  navLinks.classList.toggle("open");
+});
+
+navLinks.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    navToggle.setAttribute("aria-expanded", "false");
+    navLinks.classList.remove("open");
+  });
+});
+
+const WHATSAPP_NUMBER = "85264022209";
+
+function getSelectLabel(formEl, name) {
+  const field = formEl.elements[name];
+  if (!field || field.selectedIndex < 0) return "";
+  return field.options[field.selectedIndex].text.trim();
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const data = new FormData(form);
+  const message = [
+    "【Groove Lab 預約課堂】",
+    `姓名：${data.get("name")}`,
+    `電話：${data.get("phone")}`,
+    `報名類型：${getSelectLabel(form, "booking-type")}`,
+    `上課地區：${getSelectLabel(form, "location")}`,
+    `班別：${getSelectLabel(form, "class-size")}`,
+    `級別：${getSelectLabel(form, "grade") || "待導師評估"}`,
+    data.get("message") ? `留言：${data.get("message")}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  formNote.hidden = false;
+  window.open(
+    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
+    "_blank",
+    "noopener"
+  );
+  form.reset();
+  formNote.scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+
+const pricingTabs = document.querySelectorAll(".pricing-tab");
+const pricingPanels = document.querySelectorAll(".pricing-panel");
+const pricingGroupNotice = document.getElementById("pricing-group-notice");
+
+function updatePricingGroupNotice(tabId) {
+  if (!pricingGroupNotice) return;
+  pricingGroupNotice.hidden = tabId === "solo";
+}
+
+pricingTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const target = tab.dataset.tab;
+
+    pricingTabs.forEach((t) => {
+      t.classList.remove("active");
+      t.setAttribute("aria-selected", "false");
+    });
+    pricingPanels.forEach((panel) => {
+      panel.classList.remove("active");
+      panel.hidden = true;
+    });
+
+    tab.classList.add("active");
+    tab.setAttribute("aria-selected", "true");
+    const panel = document.getElementById(`tab-${target}`);
+    panel.classList.add("active");
+    panel.hidden = false;
+    updatePricingGroupNotice(target);
+  });
+});
+  </script>
+</body>
+</html>
