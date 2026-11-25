@@ -1,0 +1,232 @@
+import cors from "cors";
+import express from "express";
+import { v4 as uuid } from "uuid";
+import { db } from "./db.js";
+
+const app = express();
+const PORT = process.env.PORT || 8787;
+
+app.use(cors());
+app.use(express.json());
+
+const now = () => new Date().toISOString();
+
+function publicUser(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    phone: row.phone,
+    email: row.email,
+    displayName: row.display_name,
+    status: row.status,
+    createdAt: row.created_at,
+    activatedAt: row.activated_at,
+  };
+}
+
+app.get("/health", (_req, res) => {
+  res.json({ ok: true, service: "call-guard" });
+});
+
+/** Register → candidate list */
+app.post("/api/register", (req, res) => {
+  const { phone, email, displayName } = req.body || {};
+  if (!phone || typeof phone !== "string") {
+    return res.status(400).json({ error: "phone is required" });
+  }
+
+  const existing = db.prepare("SELECT * FROM users WHERE phone = ?").get(phone);
+  if (existing) {
+    return res.json({ user: publicUser(existing), created: false });
+  }
+
+  const user = {
+    id: uuid(),
+    phone,
+    email: email || null,
+    display_name: displayName || null,
+    status: "candidate",
+    created_at: now(),
+    activated_at: null,
+  };
+
+  db.prepare(
+    `INSERT INTO users (id, phone, email, display_name, status, created_at, activated_at)
+     VALUES (@id, @phone, @email, @display_name, @status, @created_at, @activated_at)`
+  ).run(user);
+
+  res.status(201).json({ user: publicUser(user), created: true });
+});
+
+app.get("/api/users/:id", (req, res) => {
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.params.id);
+  if (!user) return res.status(404).json({ error: "not found" });
+  res.json({ user: publicUser(user) });
+});
+
+/** Candidate list (admin / ops) */
+app.get("/api/lists/candidates", (_req, res) => {
+  const rows = db
+    .prepare("SELECT * FROM users WHERE status = 'candidate' ORDER BY created_at DESC")
+    .all();
+  res.json({ users: rows.map(publicUser) });
+});
+
+/** Active (paid) list */
+app.get("/api/lists/active", (_req, res) => {
+  const rows = db
+    .prepare("SELECT * FROM users WHERE status = 'active' ORDER BY activated_at DESC")
+    .all();
+  res.json({ users: rows.map(publicUser) });
+});
+
+/**
+ * Mock $1 HKD/month payment.
+ * Production: replace with Stripe / local payment webhook.
+ */
+app.post("/api/users/:id/pay", (req, res) => {
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.params.id);
+  if (!user) return res.status(404).json({ error: "not found" });
+
+  const subId = uuid();
+  const paidAt = now();
+
+  const tx = db.transaction(() => {
+    db.prepare(
+      `INSERT INTO subscriptions (id, user_id, amount_cents, currency, status, paid_at, created_at)
+       VALUES (?, ?, 100, 'HKD', 'paid', ?, ?)`
+    ).run(subId, user.id, paidAt, paidAt);
+
+    db.prepare(
+      `UPDATE users SET status = 'active', activated_at = ? WHERE id = ?`
+    ).run(paidAt, user.id);
+  });
+  tx();
+
+  const updated = db.prepare("SELECT * FROM users WHERE id = ?").get(user.id);
+  res.json({
+    user: publicUser(updated),
+    subscription: {
+      id: subId,
+      amountCents: 100,
+      currency: "HKD",
+      status: "paid",
+      paidAt,
+    },
+  });
+});
+
+/** Full spam blocklist for native sync (active members only) */
+app.get("/api/blocklist", (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) return res.status(400).json({ error: "userId required" });
+
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+  if (!user) return res.status(404).json({ error: "not found" });
+  if (user.status !== "active") {
+    return res.status(403).json({
+      error: "membership_inactive",
+      message: "付費開通後先會同步欄截名單",
+    });
+  }
+
+  const numbers = db
+    .prepare(
+      `SELECT e164, category, label_zh AS labelZh, confidence, updated_at AS updatedAt
+       FROM spam_numbers ORDER BY e164 ASC`
+    )
+    .all();
+
+  res.json({
+    version: numbers.length ? numbers[numbers.length - 1].updatedAt : now(),
+    count: numbers.length,
+    numbers,
+  });
+});
+
+/** Device reports a blocked call (Android CallScreeningService) */
+app.post("/api/blocked-calls", (req, res) => {
+  const { userId, e164, category, labelZh, blockedAt } = req.body || {};
+  if (!userId || !e164) {
+    return res.status(400).json({ error: "userId and e164 required" });
+  }
+
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+  if (!user || user.status !== "active") {
+    return res.status(403).json({ error: "membership_inactive" });
+  }
+
+  const spam = db.prepare("SELECT * FROM spam_numbers WHERE e164 = ?").get(e164);
+  const row = {
+    id: uuid(),
+    user_id: userId,
+    e164,
+    category: category || spam?.category || null,
+    label_zh: labelZh || spam?.label_zh || "已欄截來電",
+    blocked_at: blockedAt || now(),
+  };
+
+  db.prepare(
+    `INSERT INTO blocked_calls (id, user_id, e164, category, label_zh, blocked_at)
+     VALUES (@id, @user_id, @e164, @category, @label_zh, @blocked_at)`
+  ).run(row);
+
+  res.status(201).json({
+    call: {
+      id: row.id,
+      e164: row.e164,
+      category: row.category,
+      labelZh: row.label_zh,
+      blockedAt: row.blocked_at,
+    },
+  });
+});
+
+/** UI: only blocked-call history for the member */
+app.get("/api/users/:id/blocked-calls", (req, res) => {
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.params.id);
+  if (!user) return res.status(404).json({ error: "not found" });
+
+  const calls = db
+    .prepare(
+      `SELECT id, e164, category, label_zh AS labelZh, blocked_at AS blockedAt
+       FROM blocked_calls WHERE user_id = ? ORDER BY blocked_at DESC LIMIT 200`
+    )
+    .all(user.id);
+
+  res.json({ calls });
+});
+
+/** Ops: add a spam number */
+app.post("/api/spam-numbers", (req, res) => {
+  const { e164, category, labelZh, confidence } = req.body || {};
+  const allowed = ["harassment", "scam", "telemarketing", "loan"];
+  if (!e164 || !allowed.includes(category)) {
+    return res.status(400).json({ error: "e164 and valid category required" });
+  }
+
+  const labels = {
+    harassment: "騷擾電話",
+    scam: "疑似騙案電話",
+    telemarketing: "推銷電話",
+    loan: "財務借貸推介",
+  };
+
+  const id = uuid();
+  const updatedAt = now();
+  db.prepare(
+    `INSERT INTO spam_numbers (id, e164, category, label_zh, confidence, source, updated_at)
+     VALUES (?, ?, ?, ?, ?, 'manual', ?)
+     ON CONFLICT(e164) DO UPDATE SET
+       category = excluded.category,
+       label_zh = excluded.label_zh,
+       confidence = excluded.confidence,
+       updated_at = excluded.updated_at`
+  ).run(id, e164, category, labelZh || labels[category], confidence ?? 0.85, updatedAt);
+
+  res.status(201).json({ ok: true, e164, category });
+});
+
+app.listen(PORT, () => {
+  console.log(`call-guard API on http://127.0.0.1:${PORT}`);
+});

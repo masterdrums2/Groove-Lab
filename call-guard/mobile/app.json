@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Call Guard",
+    "slug": "call-guard",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "callguard",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.callguard.app",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "用於會員狀態同封鎖名單同步。"
+      }
+    },
+    "android": {
+      "package": "com.callguard.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0b1220",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": []
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-status-bar"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.sqlite
+*.sqlite-*
+.DS_Store
+.env
+.env.*
+server/data/
+
+# Expo prebuild output only (keep modules/*/android|ios)
+mobile/android/
+mobile/ios/
