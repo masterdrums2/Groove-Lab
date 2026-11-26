@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-shot starter for Call Guard on Mac (API + Expo web)
-set -euo pipefail
+set -e
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 SERVER="$ROOT/server"
@@ -8,13 +8,13 @@ MOBILE="$ROOT/mobile"
 
 echo "==> Call Guard root: $ROOT"
 
-if [[ ! -d "$SERVER" || ! -d "$MOBILE" ]]; then
-  echo "找不到 server/ 或 mobile/。"
-  echo "請先：cd ~/Call-Guard/Call-Guard 再跑呢個 script。"
+if [ ! -d "$SERVER" ] || [ ! -d "$MOBILE" ]; then
+  echo "Cannot find server/ or mobile/."
+  echo "Run from: cd ~/Call-Guard/Call-Guard"
   exit 1
 fi
 
-# Stop anything already on common ports (ignore errors)
+# Free ports if needed
 lsof -ti :8787 | xargs kill -9 2>/dev/null || true
 lsof -ti :8081 | xargs kill -9 2>/dev/null || true
 
@@ -26,19 +26,22 @@ npm run seed
 echo "==> Starting API on http://127.0.0.1:8787"
 npm start > /tmp/call-guard-api.log 2>&1 &
 API_PID=$!
-sleep 1
-if ! kill -0 "$API_PID" 2>/dev/null; then
-  echo "API 啟動失敗，睇 /tmp/call-guard-api.log"
+sleep 2
+
+if kill -0 "$API_PID" 2>/dev/null; then
+  echo "==> API started (pid $API_PID). Log: /tmp/call-guard-api.log"
+else
+  echo "==> API failed to start. Log:"
   cat /tmp/call-guard-api.log
   exit 1
 fi
-echo "API pid=$API_PID（log: /tmp/call-guard-api.log）"
 
-echo "==> Installing mobile deps (含 web)"
+echo "==> Installing mobile deps (including web)"
 cd "$MOBILE"
 npm install
 npx expo install react-dom react-native-web
 
-echo "==> Starting Expo Web（瀏覽器會開；唔使掃 QR）"
-echo "    停止：喺呢個 Terminal 撳 Ctrl+C（之後可手動 kill API: kill $API_PID）"
+echo "==> Starting Expo Web"
+echo "    When ready, open: http://localhost:8081"
+echo "    Stop with Ctrl+C. To stop API later: kill $API_PID"
 npx expo start --web
