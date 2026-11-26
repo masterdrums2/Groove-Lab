@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "seed": "node src/seed.js"
+    "seed": "node src/seed.js",
+    "import:csv": "node src/import-csv.js"
   },
   "dependencies": {
     "better-sqlite3": "^13.2.0",

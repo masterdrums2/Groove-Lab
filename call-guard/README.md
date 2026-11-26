@@ -21,12 +21,18 @@ Repo：https://github.com/Pordanpordan/Call-Guard
 
 ## 預建名單點嚟（營運，唔係等用戶中招）
 
-合法來源優先（唔抄 Whoscall 私有庫）：
+**唔抄 Whoscall 私有庫。** 而家已用公開舉報來源做成第一批 CSV：
 
-- 公開／社群舉報彙整（如 HKJunkCall 類公開紀錄、新聞披露號碼）  
-- 用戶舉報經審核後入庫（輔助）  
-- 日後正式合作 API（Whoscall Asi／同類）  
-- 人工維護四類：`harassment` / `scam` / `telemarketing` / `loan`
+```bash
+cd server
+npm run seed          # 少量示範
+npm run import:csv    # 匯入 data/prebuilt-hk-blocklist.csv（約 200+）
+npm start
+```
+
+詳見 `docs/BLOCKLIST_SOURCES.md`。
+
+之後持續：公開來源更新、人工核對、日後正式 API 合作；會員舉報只補漏。
 
 ## 目錄
 
