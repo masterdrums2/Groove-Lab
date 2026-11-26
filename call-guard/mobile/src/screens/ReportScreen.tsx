@@ -63,7 +63,7 @@ export function ReportScreen({ user, onDone, onBack }: Props) {
 
       <Text style={styles.title}>舉報號碼</Text>
       <Text style={styles.caption}>
-        舉報後會即時加入香港共享攔截庫，其他已付費會員同步後唔會再接到呢個號碼。
+        主攔截靠預建名單。呢度只係補漏：新出現嘅滋擾／騙案號碼，經舉報後加入，之後付費會員同步會一齊攔。
       </Text>
 
       <Text style={styles.label}>電話號碼</Text>

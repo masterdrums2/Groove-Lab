@@ -265,9 +265,9 @@ app.post("/api/spam-numbers", (req, res) => {
 });
 
 /**
- * Core product loop: member reports a number → enters shared HK blocklist
- * → all active members pick it up on next /api/blocklist sync.
- * MVP auto-accepts; production can insert status=pending + moderation.
+ * Supplementary path only: member reports help cover brand-new numbers.
+ * Primary product value is the pre-curated HK blocklist unlocked by $1 pay.
+ * MVP auto-accepts; production can use status=pending + moderation.
  */
 app.post("/api/reports", (req, res) => {
   const { userId, e164, category, note } = req.body || {};
@@ -319,9 +319,11 @@ app.post("/api/reports", (req, res) => {
       createdAt,
     },
     sharedWithActiveMembers: activeCount,
-    message: "已加入香港攔截庫；其他已開通會員下次同步後會一齊攔呢個號碼。",
+    message:
+      "已作補漏入庫。主攔截仍靠預建名單；其他已開通會員下次同步後會一齊攔呢個新號碼。",
   });
 });
+
 
 app.listen(PORT, () => {
   console.log(`call-guard API (HK only) on http://127.0.0.1:${PORT}`);

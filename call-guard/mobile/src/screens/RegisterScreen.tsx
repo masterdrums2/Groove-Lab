@@ -51,7 +51,7 @@ export function RegisterScreen({ onRegistered }: Props) {
       <View style={styles.hero}>
         <Text style={styles.brand}>Call Guard</Text>
         <Text style={styles.tagline}>
-          專為香港：欄截喺香港收到嘅騷擾、騙案、推銷同借貸來電
+          預先查好香港滋擾／騙案／推銷／借貸名單；付 $1 即攔，唔使响咗先知
         </Text>
       </View>
 

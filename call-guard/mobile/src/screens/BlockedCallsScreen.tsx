@@ -114,7 +114,7 @@ export function BlockedCallsScreen({ user, onLogout, onReport }: Props) {
 
       <Text style={styles.title}>已欄截來電</Text>
       <Text style={styles.caption}>
-        只顯示喺香港被欄截嘅來電。舉報一個號碼，所有已開通會員同步後一齊攔。
+        只顯示被預建名單欄截嘅來電。舉報只係補漏（新號碼），主名單由我哋預先查好。
       </Text>
 
       {message ? <Text style={styles.message}>{message}</Text> : null}
