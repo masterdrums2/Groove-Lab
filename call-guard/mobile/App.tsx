@@ -7,11 +7,15 @@ import { clearSession, loadSession, saveSession } from "./src/lib/session";
 import { BlockedCallsScreen } from "./src/screens/BlockedCallsScreen";
 import { PaywallScreen } from "./src/screens/PaywallScreen";
 import { RegisterScreen } from "./src/screens/RegisterScreen";
+import { ReportScreen } from "./src/screens/ReportScreen";
 import { colors } from "./src/theme";
+
+type Screen = "home" | "report";
 
 export default function App() {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [screen, setScreen] = useState<Screen>("home");
 
   useEffect(() => {
     (async () => {
@@ -45,6 +49,7 @@ export default function App() {
   async function handleLogout() {
     await clearSession();
     setUser(null);
+    setScreen("home");
   }
 
   if (!ready) {
@@ -63,8 +68,18 @@ export default function App() {
         <RegisterScreen onRegistered={handleRegistered} />
       ) : user.status !== "active" ? (
         <PaywallScreen user={user} onActivated={handleActivated} />
+      ) : screen === "report" ? (
+        <ReportScreen
+          user={user}
+          onBack={() => setScreen("home")}
+          onDone={() => setScreen("home")}
+        />
       ) : (
-        <BlockedCallsScreen user={user} onLogout={handleLogout} />
+        <BlockedCallsScreen
+          user={user}
+          onLogout={handleLogout}
+          onReport={() => setScreen("report")}
+        />
       )}
     </View>
   );

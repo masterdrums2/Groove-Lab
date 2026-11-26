@@ -213,6 +213,38 @@ app.get("/api/users/:id/blocked-calls", (req, res) => {
   res.json({ calls });
 });
 
+const CATEGORY_LABELS = {
+  harassment: "騷擾電話（香港）",
+  scam: "疑似騙案電話（香港）",
+  telemarketing: "推銷電話（香港）",
+  loan: "財務借貸推介（香港）",
+};
+
+function upsertSpamNumber({ e164, category, labelZh, confidence, source }) {
+  const id = uuid();
+  const updatedAt = now();
+  db.prepare(
+    `INSERT INTO spam_numbers (id, e164, category, label_zh, confidence, source, region, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, 'HK', ?)
+     ON CONFLICT(e164) DO UPDATE SET
+       category = excluded.category,
+       label_zh = excluded.label_zh,
+       confidence = MAX(spam_numbers.confidence, excluded.confidence),
+       source = excluded.source,
+       region = 'HK',
+       updated_at = excluded.updated_at`
+  ).run(
+    id,
+    e164,
+    category,
+    labelZh || CATEGORY_LABELS[category],
+    confidence ?? 0.85,
+    source,
+    updatedAt
+  );
+  return { e164, category, updatedAt };
+}
+
 /** Ops: add a spam number that calls into Hong Kong */
 app.post("/api/spam-numbers", (req, res) => {
   const { e164, category, labelZh, confidence } = req.body || {};
@@ -222,27 +254,73 @@ app.post("/api/spam-numbers", (req, res) => {
   }
 
   const normalized = normalizeHkE164(e164) || e164;
-  const labels = {
-    harassment: "騷擾電話（香港）",
-    scam: "疑似騙案電話（香港）",
-    telemarketing: "推銷電話（香港）",
-    loan: "財務借貸推介（香港）",
-  };
+  const row = upsertSpamNumber({
+    e164: normalized,
+    category,
+    labelZh,
+    confidence,
+    source: "manual",
+  });
+  res.status(201).json({ ok: true, ...row, region: "HK" });
+});
 
-  const id = uuid();
-  const updatedAt = now();
-  db.prepare(
-    `INSERT INTO spam_numbers (id, e164, category, label_zh, confidence, source, region, updated_at)
-     VALUES (?, ?, ?, ?, ?, 'manual', 'HK', ?)
-     ON CONFLICT(e164) DO UPDATE SET
-       category = excluded.category,
-       label_zh = excluded.label_zh,
-       confidence = excluded.confidence,
-       region = 'HK',
-       updated_at = excluded.updated_at`
-  ).run(id, normalized, category, labelZh || labels[category], confidence ?? 0.85, updatedAt);
+/**
+ * Core product loop: member reports a number → enters shared HK blocklist
+ * → all active members pick it up on next /api/blocklist sync.
+ * MVP auto-accepts; production can insert status=pending + moderation.
+ */
+app.post("/api/reports", (req, res) => {
+  const { userId, e164, category, note } = req.body || {};
+  const allowed = ["harassment", "scam", "telemarketing", "loan"];
+  if (!userId || !e164 || !allowed.includes(category)) {
+    return res.status(400).json({
+      error: "userId, e164 and valid category required",
+    });
+  }
 
-  res.status(201).json({ ok: true, e164: normalized, category, region: "HK" });
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+  if (!user || user.status !== "active") {
+    return res.status(403).json({
+      error: "membership_inactive",
+      message: "付費開通後先可以舉報，令其他會員一齊攔",
+    });
+  }
+
+  const normalized = normalizeHkE164(e164) || e164;
+  const reportId = uuid();
+  const createdAt = now();
+
+  const tx = db.transaction(() => {
+    db.prepare(
+      `INSERT INTO reports (id, user_id, e164, category, note, status, created_at)
+       VALUES (?, ?, ?, ?, ?, 'accepted', ?)`
+    ).run(reportId, userId, normalized, category, note || null, createdAt);
+
+    upsertSpamNumber({
+      e164: normalized,
+      category,
+      labelZh: CATEGORY_LABELS[category],
+      confidence: 0.88,
+      source: "member_report",
+    });
+  });
+  tx();
+
+  const activeCount = db
+    .prepare("SELECT COUNT(*) AS n FROM users WHERE status = 'active'")
+    .get().n;
+
+  res.status(201).json({
+    report: {
+      id: reportId,
+      e164: normalized,
+      category,
+      status: "accepted",
+      createdAt,
+    },
+    sharedWithActiveMembers: activeCount,
+    message: "已加入香港攔截庫；其他已開通會員下次同步後會一齊攔呢個號碼。",
+  });
 });
 
 app.listen(PORT, () => {

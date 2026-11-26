@@ -58,10 +58,24 @@ db.exec(`
     blocked_at TEXT NOT NULL
   );
 
+  -- Member reports → feed shared HK blocklist for all active members
+  CREATE TABLE IF NOT EXISTS reports (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    e164 TEXT NOT NULL,
+    category TEXT NOT NULL
+      CHECK (category IN ('harassment', 'scam', 'telemarketing', 'loan')),
+    note TEXT,
+    status TEXT NOT NULL DEFAULT 'accepted'
+      CHECK (status IN ('pending', 'accepted', 'rejected')),
+    created_at TEXT NOT NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
   CREATE INDEX IF NOT EXISTS idx_spam_category ON spam_numbers(category);
   CREATE INDEX IF NOT EXISTS idx_spam_region ON spam_numbers(region);
   CREATE INDEX IF NOT EXISTS idx_blocked_user ON blocked_calls(user_id, blocked_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_reports_e164 ON reports(e164, created_at DESC);
 `);
 
 /** Lightweight migrations for DBs created before HK market columns. */

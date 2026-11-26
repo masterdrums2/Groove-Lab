@@ -91,3 +91,28 @@ export function reportBlockedCall(input: {
     body: JSON.stringify(input),
   });
 }
+
+export type ReportCategory = "harassment" | "scam" | "telemarketing" | "loan";
+
+/** Report a number into the shared HK blocklist for all active members. */
+export function reportSpamNumber(input: {
+  userId: string;
+  e164: string;
+  category: ReportCategory;
+  note?: string;
+}) {
+  return request<{
+    report: {
+      id: string;
+      e164: string;
+      category: string;
+      status: string;
+      createdAt: string;
+    };
+    sharedWithActiveMembers: number;
+    message: string;
+  }>("/api/reports", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}

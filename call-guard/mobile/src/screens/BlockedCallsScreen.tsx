@@ -26,6 +26,7 @@ import { colors } from "../theme";
 type Props = {
   user: User;
   onLogout: () => void;
+  onReport: () => void;
 };
 
 const categoryLabel: Record<string, string> = {
@@ -35,7 +36,7 @@ const categoryLabel: Record<string, string> = {
   loan: "借貸",
 };
 
-export function BlockedCallsScreen({ user, onLogout }: Props) {
+export function BlockedCallsScreen({ user, onLogout, onReport }: Props) {
   const [calls, setCalls] = useState<BlockedCall[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -113,14 +114,17 @@ export function BlockedCallsScreen({ user, onLogout }: Props) {
 
       <Text style={styles.title}>已欄截來電</Text>
       <Text style={styles.caption}>
-        只顯示喺香港被欄截嘅來電；唔會顯示普通來電。
+        只顯示喺香港被欄截嘅來電。舉報一個號碼，所有已開通會員同步後一齊攔。
       </Text>
 
       {message ? <Text style={styles.message}>{message}</Text> : null}
 
       <View style={styles.actions}>
+        <Pressable style={styles.primaryBtn} onPress={onReport}>
+          <Text style={styles.primaryText}>舉報號碼</Text>
+        </Pressable>
         <Pressable style={styles.secondaryBtn} onPress={onRefresh}>
-          <Text style={styles.secondaryText}>同步封鎖名單</Text>
+          <Text style={styles.secondaryText}>同步名單</Text>
         </Pressable>
         <Pressable style={styles.secondaryBtn} onPress={simulateBlock}>
           <Text style={styles.secondaryText}>模擬欄截</Text>
@@ -202,7 +206,14 @@ const styles = StyleSheet.create({
   },
   caption: { marginTop: 8, color: colors.muted, lineHeight: 20 },
   message: { marginTop: 12, color: colors.accent },
-  actions: { flexDirection: "row", gap: 10, marginTop: 18, marginBottom: 8 },
+  actions: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 18, marginBottom: 8 },
+  primaryBtn: {
+    backgroundColor: colors.accent,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  primaryText: { color: colors.bg, fontSize: 13, fontWeight: "700" },
   secondaryBtn: {
     backgroundColor: colors.bgElevated,
     borderRadius: 10,
