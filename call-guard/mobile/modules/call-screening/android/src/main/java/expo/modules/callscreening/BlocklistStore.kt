@@ -4,8 +4,10 @@ import android.content.Context
 import org.json.JSONArray
 
 /**
- * Local copy of the server blocklist used by CallGuardScreeningService.
- * Keys are normalized digits-only forms of E.164 numbers.
+ * Local copy of the HK inbound blocklist used by CallGuardScreeningService.
+ *
+ * Matching is Hong Kong–aware: 8-digit local display and +852 E.164 both hit
+ * the same entry. Overseas numbers that call into HK are stored as full E.164.
  */
 object BlocklistStore {
   private const val PREFS = "call_guard_blocklist"
@@ -35,22 +37,32 @@ object BlocklistStore {
     val raw = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
       .getString(KEY_NUMBERS, null) ?: return null
 
-    val needle = normalize(incoming)
+    val needles = matchKeys(incoming)
     val arr = JSONArray(raw)
     for (i in 0 until arr.length()) {
       val obj = arr.getJSONObject(i)
       val e164 = obj.optString("e164")
-      if (normalize(e164) == needle) {
+      val keys = matchKeys(e164)
+      if (needles.any { it in keys }) {
         return Entry(
           e164 = e164,
           category = obj.optString("category"),
-          labelZh = obj.optString("labelZh", "已欄截來電"),
+          labelZh = obj.optString("labelZh", "已欄截來電（香港）"),
         )
       }
     }
     return null
   }
 
-  private fun normalize(value: String): String =
-    value.filter { it.isDigit() }
+  /** Digits-only keys covering local 8-digit and +852 forms. */
+  private fun matchKeys(value: String): Set<String> {
+    val d = value.filter { it.isDigit() }
+    if (d.isEmpty()) return emptySet()
+    val keys = mutableSetOf(d)
+    when {
+      d.startsWith("852") && d.length == 11 -> keys.add(d.substring(3))
+      d.length == 8 -> keys.add("852$d")
+    }
+    return keys
+  }
 }

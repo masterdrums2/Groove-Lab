@@ -2,9 +2,12 @@ import cors from "cors";
 import express from "express";
 import { v4 as uuid } from "uuid";
 import { db } from "./db.js";
+import { isHongKongMemberPhone, normalizeHkE164 } from "./hkPhone.js";
 
 const app = express();
 const PORT = process.env.PORT || 8787;
+/** Product is Hong Kong–only: block calls received by HK members. */
+const MARKET = "HK";
 
 app.use(cors());
 app.use(express.json());
@@ -19,40 +22,51 @@ function publicUser(row) {
     email: row.email,
     displayName: row.display_name,
     status: row.status,
+    market: row.market || MARKET,
     createdAt: row.created_at,
     activatedAt: row.activated_at,
   };
 }
 
 app.get("/health", (_req, res) => {
-  res.json({ ok: true, service: "call-guard" });
+  res.json({ ok: true, service: "call-guard", market: MARKET });
 });
 
-/** Register → candidate list */
+/** Register → candidate list (Hong Kong numbers only) */
 app.post("/api/register", (req, res) => {
   const { phone, email, displayName } = req.body || {};
   if (!phone || typeof phone !== "string") {
     return res.status(400).json({ error: "phone is required" });
   }
 
-  const existing = db.prepare("SELECT * FROM users WHERE phone = ?").get(phone);
+  if (!isHongKongMemberPhone(phone)) {
+    return res.status(400).json({
+      error: "hk_phone_required",
+      message: "只支援香港號碼（+852）。本服務淨係欄截喺香港收到嘅來電。",
+    });
+  }
+
+  const normalized = normalizeHkE164(phone);
+
+  const existing = db.prepare("SELECT * FROM users WHERE phone = ?").get(normalized);
   if (existing) {
     return res.json({ user: publicUser(existing), created: false });
   }
 
   const user = {
     id: uuid(),
-    phone,
+    phone: normalized,
     email: email || null,
     display_name: displayName || null,
     status: "candidate",
+    market: MARKET,
     created_at: now(),
     activated_at: null,
   };
 
   db.prepare(
-    `INSERT INTO users (id, phone, email, display_name, status, created_at, activated_at)
-     VALUES (@id, @phone, @email, @display_name, @status, @created_at, @activated_at)`
+    `INSERT INTO users (id, phone, email, display_name, status, market, created_at, activated_at)
+     VALUES (@id, @phone, @email, @display_name, @status, @market, @created_at, @activated_at)`
   ).run(user);
 
   res.status(201).json({ user: publicUser(user), created: true });
@@ -130,14 +144,16 @@ app.get("/api/blocklist", (req, res) => {
     });
   }
 
+  // Only numbers known to call into Hong Kong
   const numbers = db
     .prepare(
       `SELECT e164, category, label_zh AS labelZh, confidence, updated_at AS updatedAt
-       FROM spam_numbers ORDER BY e164 ASC`
+       FROM spam_numbers WHERE region = 'HK' ORDER BY e164 ASC`
     )
     .all();
 
   res.json({
+    market: MARKET,
     version: numbers.length ? numbers[numbers.length - 1].updatedAt : now(),
     count: numbers.length,
     numbers,
@@ -197,7 +213,7 @@ app.get("/api/users/:id/blocked-calls", (req, res) => {
   res.json({ calls });
 });
 
-/** Ops: add a spam number */
+/** Ops: add a spam number that calls into Hong Kong */
 app.post("/api/spam-numbers", (req, res) => {
   const { e164, category, labelZh, confidence } = req.body || {};
   const allowed = ["harassment", "scam", "telemarketing", "loan"];
@@ -205,28 +221,30 @@ app.post("/api/spam-numbers", (req, res) => {
     return res.status(400).json({ error: "e164 and valid category required" });
   }
 
+  const normalized = normalizeHkE164(e164) || e164;
   const labels = {
-    harassment: "騷擾電話",
-    scam: "疑似騙案電話",
-    telemarketing: "推銷電話",
-    loan: "財務借貸推介",
+    harassment: "騷擾電話（香港）",
+    scam: "疑似騙案電話（香港）",
+    telemarketing: "推銷電話（香港）",
+    loan: "財務借貸推介（香港）",
   };
 
   const id = uuid();
   const updatedAt = now();
   db.prepare(
-    `INSERT INTO spam_numbers (id, e164, category, label_zh, confidence, source, updated_at)
-     VALUES (?, ?, ?, ?, ?, 'manual', ?)
+    `INSERT INTO spam_numbers (id, e164, category, label_zh, confidence, source, region, updated_at)
+     VALUES (?, ?, ?, ?, ?, 'manual', 'HK', ?)
      ON CONFLICT(e164) DO UPDATE SET
        category = excluded.category,
        label_zh = excluded.label_zh,
        confidence = excluded.confidence,
+       region = 'HK',
        updated_at = excluded.updated_at`
-  ).run(id, e164, category, labelZh || labels[category], confidence ?? 0.85, updatedAt);
+  ).run(id, normalized, category, labelZh || labels[category], confidence ?? 0.85, updatedAt);
 
-  res.status(201).json({ ok: true, e164, category });
+  res.status(201).json({ ok: true, e164: normalized, category, region: "HK" });
 });
 
 app.listen(PORT, () => {
-  console.log(`call-guard API on http://127.0.0.1:${PORT}`);
+  console.log(`call-guard API (HK only) on http://127.0.0.1:${PORT}`);
 });

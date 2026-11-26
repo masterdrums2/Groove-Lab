@@ -71,7 +71,7 @@ export function PaywallScreen({ user, onActivated }: Props) {
       <Text style={styles.kicker}>候選會員</Text>
       <Text style={styles.title}>開通來電欄截</Text>
       <Text style={styles.body}>
-        付費後你會由候選名單移入已開通名單，App 會下載騷擾／騙案／推銷／借貸號碼庫，並寫入系統欄截清單。
+        付費後你會由候選名單移入已開通名單。App 只同步「會打入香港」嘅騷擾／騙案／推銷／借貸號碼，並寫入系統欄截清單。
       </Text>
 
       <View style={styles.priceCard}>

@@ -112,7 +112,9 @@ export function BlockedCallsScreen({ user, onLogout }: Props) {
       </View>
 
       <Text style={styles.title}>已欄截來電</Text>
-      <Text style={styles.caption}>介面只顯示被欄截嘅紀錄，唔會顯示普通來電。</Text>
+      <Text style={styles.caption}>
+        只顯示喺香港被欄截嘅來電；唔會顯示普通來電。
+      </Text>
 
       {message ? <Text style={styles.message}>{message}</Text> : null}
 

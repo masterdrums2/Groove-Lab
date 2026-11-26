@@ -50,7 +50,9 @@ export function RegisterScreen({ onRegistered }: Props) {
     >
       <View style={styles.hero}>
         <Text style={styles.brand}>Call Guard</Text>
-        <Text style={styles.tagline}>欄截騷擾、騙案、推銷同借貸來電</Text>
+        <Text style={styles.tagline}>
+          專為香港：欄截喺香港收到嘅騷擾、騙案、推銷同借貸來電
+        </Text>
       </View>
 
       <View style={styles.form}>
@@ -89,7 +91,7 @@ export function RegisterScreen({ onRegistered }: Props) {
         </Pressable>
 
         <Text style={styles.hint}>
-          註冊後會進入候選名單；付 HK$1／月後先會開通欄截。
+          只接受香港 +852 號碼。註冊後入候選名單；付 HK$1／月後開通，欄截打入香港嘅滋擾／騙案來電。
         </Text>
       </View>
     </KeyboardAvoidingView>
