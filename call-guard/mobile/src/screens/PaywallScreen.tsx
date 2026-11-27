@@ -71,7 +71,7 @@ export function PaywallScreen({ user, onActivated }: Props) {
       <Text style={styles.kicker}>候選會員</Text>
       <Text style={styles.title}>開通來電欄截</Text>
       <Text style={styles.body}>
-        付費後即開通：同步我哋預先查好、會打入香港嘅騷擾／騙案／推銷／借貸名單。名單入面嘅號碼唔會 call 到你——唔使等响咗先 check。
+        付費後即開通：同步我哋預先查好、會打入香港嘅騷擾／騙案／推銷／借貸名單。名單入面嘅號碼唔會 call 到你——唔使等響咗先 check。
       </Text>
 
       <View style={styles.priceCard}>

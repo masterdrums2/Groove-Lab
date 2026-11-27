@@ -19,6 +19,15 @@
 
 Repo：https://github.com/Pordanpordan/Call-Guard
 
+## 兩個後端（互唔影響）
+
+| 目錄 | 技術 | 預設埠 |
+|------|------|--------|
+| `server/` | Node + Express（原本） | 8787 |
+| `server-django/` | **Python + Django**（學習版） | 8788 |
+
+詳見 `server-django/README.md`。App 用 `EXPO_PUBLIC_API_URL` 揀連邊個。
+
 ## 預建名單點嚟（營運，唔係等用戶中招）
 
 **唔抄 Whoscall 私有庫。** 而家已用公開舉報來源做成第一批 CSV：
